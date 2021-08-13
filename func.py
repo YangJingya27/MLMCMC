@@ -15,33 +15,36 @@ def example(dimension):
 
 
 # 混合先验中的TV项
-def DX_1(xy, dim):
-    DX1 = 0
-    for z in range(dim - 1):  # 这里的维度是变化的
-        dx_1 = abs(xy[z + 1] - xy[z])
-        DX1 = DX1 + dx_1
-    return DX1
+def D_1(u_arr):
+    return np.sum(np.abs(np.diff(u_arr.flatten())))
+
+# np.sum(np.abs(np.diff(np.arange(7))))
 
 
-############################################################针对三层的情况
+############################################################针对2层的情况
 lam = 300
-Sigma2 = 0.02**2
-Sigma1 = (1+1/80) * Sigma2
+# Sigma2 = 0.02**2
+# Sigma1 = (1+1/80) * Sigma2
+# Sigma0 = (1+1/40) * Sigma1
+Sigma1 = 0.02**2
 Sigma0 = (1+1/40) * Sigma1
 
 
 # 混合先验 target distribution 的指数部分
-def p_target(y_arr, u_arr, dim):
+def p_target(y_arr, u_arr):
     # part_u = (u_arr.T.dot(k)).dot(u_arr)
-    part_y0 = (y_arr-u_arr).T.dot(y_arr-u_arr) * 1/Sigma0
+    part_y0 = (y_arr - u_arr).T.dot(y_arr-u_arr) * 1/Sigma0
     part_y1 = (y_arr - u_arr).T.dot(y_arr - u_arr) * 1 / Sigma1
-    part_y2 = (y_arr - u_arr).T.dot(y_arr - u_arr) * 1 / Sigma2
+    # part_y2 = (y_arr - u_arr).T.dot(y_arr - u_arr) * 1 / Sigma2
     # X = 0.5 * (part_u + part_y)+lam * DX_1(u_arr, dim)
-    X0 = 0.5 * part_y0 + lam * DX_1(u_arr, dim)
-    X1 = 0.5 * part_y1 + lam * DX_1(u_arr, dim)
-    X2 = 0.5 * part_y2 + lam * DX_1(u_arr, dim)
+    # X0 = 0.5 * part_y0 + lam * D_1(u_arr)
+    # X1 = 0.5 * part_y1 + lam * D_1(u_arr)
+    X0 = 0.5 * part_y0
+    X1 = 0.5 * part_y1
+    # X2 = 0.5 * part_y2 + lam * DX_1(u_arr, dim)
     # 每一个X代表第n层的取值，由于每一层的似然函数的方差不同，所以分别表示
-    return -1*X0[0, 0], -1*X1[0, 0], -1*X2[0, 0]
+    # return -1*X0[0, 0], -1*X1[0, 0], -1*X2[0, 0]
+    return -1*X0[0, 0], -1*X1[0, 0]
 
 
 def chazhi(arr):
